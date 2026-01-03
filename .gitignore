@@ -9,6 +9,8 @@ obj/
 
 .idea/
 
+*.http
+
 node_modules/
 dist/
 build/
