@@ -1,5 +1,0 @@
-@Todo.Api_HostAddress = http://localhost:5182
-
-GET {{Todo.Api_HostAddress}}/
-
-###
