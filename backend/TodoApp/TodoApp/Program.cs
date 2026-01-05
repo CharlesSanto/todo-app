@@ -16,6 +16,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapGet("/todos", () => { })
+.WithName("GetTodos")
 .WithOpenApi();
 
 app.Run();
