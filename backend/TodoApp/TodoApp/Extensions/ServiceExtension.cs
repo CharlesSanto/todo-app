@@ -1,4 +1,5 @@
-﻿using TodoApp.Repository;
+﻿using FluentValidation;
+using TodoApp.Repository;
 using TodoApp.Repository.Interfaces;
 using TodoApp.Services;
 using TodoApp.Services.Interfaces;
@@ -20,6 +21,12 @@ namespace TodoApp.Extensions
             services.AddScoped<ITodoService, TodoService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITagService, TagService>();
+            return services;
+        }
+
+        public static IServiceCollection AddValidators(this IServiceCollection services)
+        {
+            services.AddValidatorsFromAssemblyContaining<Program>();
             return services;
         }
     }
