@@ -32,11 +32,10 @@ namespace TodoApp.Repository
             return todo;
         }
 
-        public async Task<Todo?> UpdateTodoAsync(Todo todo)
+        public async Task UpdateTodoAsync(Todo todo)
         {
             _context.Todos.Update(todo);
             await _context.SaveChangesAsync();
-            return todo;
         }
 
         public async Task DeleteTodoAsync(Todo todo)

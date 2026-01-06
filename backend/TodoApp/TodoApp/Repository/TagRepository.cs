@@ -33,12 +33,10 @@ namespace TodoApp.Repository
             return tag;
         }
 
-        public async Task<Tag?> UpdateTagAsync(Tag tag)
+        public async Task UpdateTagAsync(Tag tag)
         {
             _context.Tags.Update(tag);
             await _context.SaveChangesAsync();
-
-            return tag;
         }
 
         public async Task DeleteTagAsync(Tag tag)
