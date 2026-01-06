@@ -1,6 +1,6 @@
 ﻿namespace TodoApp.DTOs.TagDtos
 {
-    public class UpdateDtoTag
+    public class UpdateTagDto
     {
         public string? Name { get; set; }
     }

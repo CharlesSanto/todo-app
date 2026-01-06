@@ -11,6 +11,7 @@ namespace TodoApp.Extensions
         {
             services.AddScoped<ITodoRepository, TodoRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
             return services;
         }
 
@@ -18,6 +19,7 @@ namespace TodoApp.Extensions
         {
             services.AddScoped<ITodoService, TodoService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITagService, TagService>();
             return services;
         }
     }
