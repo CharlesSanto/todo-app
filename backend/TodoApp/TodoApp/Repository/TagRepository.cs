@@ -1,4 +1,5 @@
-﻿using TodoApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TodoApp.Data;
 using TodoApp.Models;
 using TodoApp.Repository.Interfaces;
 
@@ -14,34 +15,34 @@ namespace TodoApp.Repository
             _context = context;
         }
 
-        public Task<IEnumerable<Tag>> GetAllTagsAsync(int userId)
+        public async Task<IEnumerable<Tag>> GetAllTagsAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Tags.Where(t => t.UserId == userId).ToListAsync();
         }
 
-        public Task<Tag?> GetTagByIdAsync(int id, int userId)
+        public async Task<Tag?> GetTagByIdAsync(int id, int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Tags.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
 
-        public Task<Tag?> GetTagByNameAsync(string name, int userId)
+        public async Task<Tag> CreateTagAsync(Tag tag)
         {
-            throw new NotImplementedException();
+            _context.Tags.Add(tag);
+            await _context.SaveChangesAsync();
+
+            return tag;
         }
 
-        public Task<Tag> CreateTagAsync(Tag tag)
+        public async Task UpdateTagAsync(Tag tag)
         {
-            throw new NotImplementedException();
+            _context.Tags.Update(tag);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<Tag?> UpdateTagAsync(Tag tag)
+        public async Task DeleteTagAsync(Tag tag)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> DeleteTagAsync(int id, int userId)
-        {
-            throw new NotImplementedException();
+            _context.Tags.Remove(tag);
+            await _context.SaveChangesAsync();
         }
     }
 }

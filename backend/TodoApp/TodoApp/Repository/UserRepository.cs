@@ -1,4 +1,5 @@
-﻿using TodoApp.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TodoApp.Data;
 using TodoApp.Models;
 using TodoApp.Repository.Interfaces;
 
@@ -13,29 +14,33 @@ namespace TodoApp.Repository
             _context = context;
         }
 
-        public Task<User?> GetUserByIdAsync(int id)
+        public async Task<User?> GetUserByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FindAsync(id);
         }
 
-        public Task<User?> GetUserByEmailAsync(string email)
+        public async Task<User?> GetUserByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        public Task<User> CreateUserAsync(User user)
+        public async Task<User> CreateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return user;
         }
 
-        public Task<User?> UpdateUserAsync(User user)
+        public async Task UpdateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<bool> DeleteUserAsync(int id)
+        public async Task DeleteUserAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
         }
     }
 }
