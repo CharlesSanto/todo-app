@@ -1,6 +1,7 @@
 ﻿using TodoApp.Repository.Interfaces;
 using TodoApp.Models;
 using TodoApp.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace TodoApp.Repository
 {
@@ -13,29 +14,35 @@ namespace TodoApp.Repository
             _context = context;
         }
 
-        public Task<IEnumerable<Todo>> GetAllTodosAsync(int userId)
+        public async Task<IEnumerable<Todo>> GetAllTodosAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Todos.Where(t => t.UserId == userId).ToListAsync();
         }
 
-        public Task<Todo?> GetTodoByIdAsync(int id, int userId)
+        public async Task<Todo?> GetTodoByIdAsync(int id, int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Todos.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
 
-        public Task<Todo> CreateTodoAsync(Todo todo)
+        public async Task<Todo> CreateTodoAsync(Todo todo)
         {
-            throw new NotImplementedException();
+            await _context.Todos.AddAsync(todo);
+            await _context.SaveChangesAsync();
+
+            return todo;
         }
 
-        public Task<Todo?> UpdateTodoAsync(Todo todo)
+        public async Task<Todo?> UpdateTodoAsync(Todo todo)
         {
-            throw new NotImplementedException();
+            _context.Todos.Update(todo);
+            await _context.SaveChangesAsync();
+            return todo;
         }
 
-        public Task<bool> DeleteTodoAsync(int id, int userId)
+        public async Task DeleteTodoAsync(Todo todo)
         {
-            throw new NotImplementedException();
+            _context.Todos.Remove(todo);
+            await _context.SaveChangesAsync();
         }
 
     }

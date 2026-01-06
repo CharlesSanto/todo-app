@@ -8,6 +8,6 @@ namespace TodoApp.Repository.Interfaces
         Task<Todo?> GetTodoByIdAsync(int id, int userId);
         Task<Todo> CreateTodoAsync(Todo todo);
         Task<Todo?> UpdateTodoAsync(Todo todo);
-        Task<bool> DeleteTodoAsync(int id, int userId);
+        Task DeleteTodoAsync(Todo todo);
     }
 }
