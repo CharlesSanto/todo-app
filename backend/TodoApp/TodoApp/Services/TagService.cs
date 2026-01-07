@@ -30,14 +30,6 @@ namespace TodoApp.Services
             return new TagResponseDto(tag);
         }
 
-        public async Task<TagResponseDto?> GetTagByNameAsync(string tagName, int userId)
-        {
-            var tag = await _tagRepository.GetTagByNameAsync(tagName, userId);
-            if (tag == null) return null;
-
-            return new TagResponseDto(tag);
-        }
-
         public async Task<TagResponseDto> CreateTagAsync(int userId, CreateTagDto tagCreateDto)
         {
             var existingTag = await _tagRepository.GetTagByNameAsync(tagCreateDto.Name, userId);
