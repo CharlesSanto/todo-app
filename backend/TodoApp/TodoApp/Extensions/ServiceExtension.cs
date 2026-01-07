@@ -3,6 +3,7 @@ using TodoApp.Repository;
 using TodoApp.Repository.Interfaces;
 using TodoApp.Services;
 using TodoApp.Services.Interfaces;
+using TodoApp.Security;
 
 namespace TodoApp.Extensions
 {
@@ -21,6 +22,12 @@ namespace TodoApp.Extensions
             services.AddScoped<ITodoService, TodoService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITagService, TagService>();
+            return services;
+        }
+
+        public static IServiceCollection AddSecurity(this IServiceCollection services)
+        {
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
             return services;
         }
 
