@@ -27,7 +27,7 @@ namespace TodoApp.Extensions
 
         public static IServiceCollection AddSecurity(this IServiceCollection services)
         {
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
             return services;
         }
 
