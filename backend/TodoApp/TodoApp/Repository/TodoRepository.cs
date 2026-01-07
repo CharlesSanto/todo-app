@@ -30,13 +30,6 @@ namespace TodoApp.Repository
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
 
-        public async Task<Todo?> GetTodoByNameAsync(string title, int userId)
-        {
-            return await _context.Todos
-                .Include(t => t.Tags)
-                .FirstOrDefaultAsync(t => t.Title == title && t.UserId == userId);
-        }
-
         public async Task<Todo> CreateTodoAsync(Todo todo)
         {
             await _context.Todos.AddAsync(todo);
