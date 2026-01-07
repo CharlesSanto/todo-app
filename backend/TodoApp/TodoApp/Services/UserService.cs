@@ -48,9 +48,7 @@ namespace TodoApp.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdUser = await _userRepository.CreateUserAsync(user);
-
-            return new UserResponseDto(createdUser);
+            return new UserResponseDto(await _userRepository.CreateUserAsync(user));
         }
 
         public async Task<UserResponseDto?> UpdateUserAsync(int id, UpdateUserDto updateUserDto)
@@ -86,9 +84,7 @@ namespace TodoApp.Services
 
             user.UpdatedAt = DateTime.UtcNow;
 
-            var updatedUser = await _userRepository.UpdateUserAsync(user);
-
-            return new UserResponseDto(updatedUser);
+            return new UserResponseDto(await _userRepository.UpdateUserAsync(user));
         }
 
         public async Task<bool> DeleteUserAsync(int id)

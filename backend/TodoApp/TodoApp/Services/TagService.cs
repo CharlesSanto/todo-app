@@ -69,9 +69,7 @@ namespace TodoApp.Services
                 existingTag.Name = tagUpdateDto.Name;
             }
 
-            var updatedTag = await _tagRepository.UpdateTagAsync(existingTag);
-
-            return new TagResponseDto(updatedTag);
+            return new TagResponseDto(await _tagRepository.UpdateTagAsync(existingTag));
         }
 
         public async Task<bool> DeleteTagAsync(int tagId, int userId)
