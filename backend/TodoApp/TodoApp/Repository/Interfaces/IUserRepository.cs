@@ -7,7 +7,7 @@ namespace TodoApp.Repository.Interfaces
         Task<User?> GetUserByIdAsync(int id);
         Task<User?> GetUserByEmailAsync(string email);
         Task<User> CreateUserAsync(User user);
-        Task UpdateUserAsync(User user);
+        Task<User> UpdateUserAsync(User user);
         Task DeleteUserAsync(User user);
     }
 }

@@ -1,9 +1,20 @@
-﻿namespace TodoApp.DTOs.UserDtos
+﻿using System.Diagnostics.CodeAnalysis;
+using TodoApp.Models;
+
+namespace TodoApp.DTOs.UserDtos
 {
     public class UserResponseDto
     {
-        public required int Id { get; set; }
-        public required string Name { get; set; }
-        public required string Email { get; set; }
+        public required int Id { get; init; }
+        public required string Name { get; init; }
+        public required string Email { get; init; }
+
+        [SetsRequiredMembers]
+        public UserResponseDto(User user)
+        {
+            Id = user.Id;
+            Name = user.Name;
+            Email = user.Email;
+        }
     }
 }

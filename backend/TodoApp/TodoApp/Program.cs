@@ -13,6 +13,7 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 
 builder.Services.AddRepositories()
                 .AddServices()
+                .AddSecurity()
                 .AddValidators();
 
 var app = builder.Build();

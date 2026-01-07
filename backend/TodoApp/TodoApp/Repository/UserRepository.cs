@@ -31,10 +31,12 @@ namespace TodoApp.Repository
             return user;
         }
 
-        public async Task UpdateUserAsync(User user)
+        public async Task<User> UpdateUserAsync(User user)
         {
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
+
+            return user;
         }
 
         public async Task DeleteUserAsync(User user)
