@@ -1,6 +1,7 @@
 ﻿using TodoApp.DTOs.TagDtos;
 using TodoApp.Repository.Interfaces;
 using TodoApp.Services.Interfaces;
+using TodoApp.Models;
 
 namespace TodoApp.Services
 {
@@ -13,34 +14,74 @@ namespace TodoApp.Services
             _tagRepository = tagRepository;
         }
 
-        public Task<IEnumerable<TagResponseDto>> GetAllTagsAsync(int userId)
+        public async Task<IEnumerable<TagResponseDto>> GetAllTagsAsync(int userId)
         {
-            throw new NotImplementedException();
+            var tags = await _tagRepository.GetAllTagsAsync(userId);
+
+            return tags.Select(tag => new TagResponseDto(tag));
         }
 
-        public Task<TagResponseDto> GetTagByIdAsync(int tagId, int userId)
+        public async Task<TagResponseDto?> GetTagByIdAsync(int tagId, int userId)
         {
-            throw new NotImplementedException();
+            var tag =  await _tagRepository.GetTagByIdAsync(tagId, userId);
+
+            if (tag == null) return null;
+
+            return new TagResponseDto(tag);
         }
 
-        public Task<TagResponseDto> GetTagByNameAsync(string name, int userId)
+        public async Task<TagResponseDto?> GetTagByNameAsync(string tagName, int userId)
         {
-            throw new NotImplementedException();
+            var tag = await _tagRepository.GetTagByNameAsync(tagName, userId);
+            if (tag == null) return null;
+
+            return new TagResponseDto(tag);
         }
 
-        public Task<TagResponseDto> CreateTagAsync(int userId, CreateTagDto tagCreateDto)
+        public async Task<TagResponseDto> CreateTagAsync(int userId, CreateTagDto tagCreateDto)
         {
-            throw new NotImplementedException();
+            var existingTag = await _tagRepository.GetTagByNameAsync(tagCreateDto.Name, userId);
+
+            if (existingTag != null)
+            {
+                return new TagResponseDto(existingTag);
+            }
+
+            var newTag = new Tag
+            {
+                Name = tagCreateDto.Name,
+                UserId = userId
+            };
+
+            var tag = await  _tagRepository.CreateTagAsync(newTag);
+
+            return new TagResponseDto(tag);
         }
 
-        public Task<TagResponseDto> UpdateTagAsync(int userId, int tagId, UpdateTagDto tagUpdateDto)
+        public async Task<TagResponseDto?> UpdateTagAsync(int userId, int tagId, UpdateTagDto tagUpdateDto)
         {
-            throw new NotImplementedException();
+            var existingTag = await _tagRepository.GetTagByIdAsync(tagId, userId);
+
+            if (existingTag == null) return null;
+
+            if (!string.IsNullOrWhiteSpace(tagUpdateDto.Name) && tagUpdateDto.Name != existingTag.Name)
+            {
+                existingTag.Name = tagUpdateDto.Name;
+            }
+
+            var updatedTag = await _tagRepository.UpdateTagAsync(existingTag);
+
+            return new TagResponseDto(updatedTag);
         }
 
-        public Task<bool> DeleteTagAsync(int tagId, int userId)
+        public async Task<bool> DeleteTagAsync(int tagId, int userId)
         {
-            throw new NotImplementedException();
+            var tag = await _tagRepository.GetTagByIdAsync(tagId, userId);
+
+            if (tag == null) return false;
+
+            await _tagRepository.DeleteTagAsync(tag);
+            return true;
         }
 
     }

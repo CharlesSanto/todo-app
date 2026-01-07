@@ -17,6 +17,7 @@ namespace TodoApp.Repository
         public async Task<IEnumerable<Todo>> GetAllTodosAsync(int userId)
         {
             return await _context.Todos
+                .AsNoTracking()
                 .Include(t => t.Tags)
                 .Where(t => t.UserId == userId)
                 .ToListAsync();
