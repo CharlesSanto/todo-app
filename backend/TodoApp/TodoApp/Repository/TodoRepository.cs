@@ -16,12 +16,24 @@ namespace TodoApp.Repository
 
         public async Task<IEnumerable<Todo>> GetAllTodosAsync(int userId)
         {
-            return await _context.Todos.Where(t => t.UserId == userId).ToListAsync();
+            return await _context.Todos
+                .Include(t => t.Tags)
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task<Todo?> GetTodoByIdAsync(int id, int userId)
         {
-            return await _context.Todos.FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            return await _context.Todos
+                .Include(t => t.Tags)
+                .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+        }
+
+        public async Task<Todo?> GetTodoByNameAsync(string title, int userId)
+        {
+            return await _context.Todos
+                .Include(t => t.Tags)
+                .FirstOrDefaultAsync(t => t.Title == title && t.UserId == userId);
         }
 
         public async Task<Todo> CreateTodoAsync(Todo todo)
@@ -32,10 +44,12 @@ namespace TodoApp.Repository
             return todo;
         }
 
-        public async Task UpdateTodoAsync(Todo todo)
+        public async Task<Todo> UpdateTodoAsync(Todo todo)
         {
             _context.Todos.Update(todo);
             await _context.SaveChangesAsync();
+
+            return todo;
         }
 
         public async Task DeleteTodoAsync(Todo todo)
