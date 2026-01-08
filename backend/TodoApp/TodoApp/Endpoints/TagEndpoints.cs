@@ -8,7 +8,7 @@ namespace TodoApp.Endpoints
     {
         public static WebApplication MapTagEndpoints(this WebApplication app)
         {
-            var mapGroup = app.MapGroup("/tags").WithTags("Tags");
+            var mapGroup = app.MapGroup("/tags").WithTags("Tags").RequireAuthorization();
 
             mapGroup.MapGet("/", async (int userId, ITagService tagService) =>
             {

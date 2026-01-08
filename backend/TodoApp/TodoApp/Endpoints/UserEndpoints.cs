@@ -9,7 +9,7 @@ namespace TodoApp.Endpoints
     {
         public static WebApplication MapUserEndpoints(this WebApplication app)
         {
-            var mapGroup = app.MapGroup("/users").WithTags("Users");
+            var mapGroup = app.MapGroup("/users").WithTags("Users").RequireAuthorization();
 
             mapGroup.MapGet("/me", async (int id, IUserService service) =>
             {
@@ -37,7 +37,7 @@ namespace TodoApp.Endpoints
                 {
                     return Results.Conflict(new { message = ex.Message });
                 }
-            });
+            }).AllowAnonymous();
 
             mapGroup.MapPatch("/{id}", async (UpdateUserDto dto, IUserService service, int id, UpdateUserValidator validator) =>
             {
