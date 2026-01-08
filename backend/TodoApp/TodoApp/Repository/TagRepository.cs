@@ -35,6 +35,13 @@ namespace TodoApp.Repository
                 .FirstOrDefaultAsync(t => t.Name.ToLower() == name.ToLower() && t.UserId == userId);
         }
 
+        public async Task<List<Tag>> GetByIdsAsync(IEnumerable<int> ids, int userId)
+        {
+            return await _context.Tags
+                .Where(t => ids.Contains(t.Id) && t.UserId == userId)
+                .ToListAsync();
+        }
+
         public async Task<Tag> CreateTagAsync(Tag tag)
         {
             _context.Tags.Add(tag);

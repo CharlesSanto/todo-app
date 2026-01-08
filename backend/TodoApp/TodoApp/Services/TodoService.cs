@@ -9,10 +9,12 @@ namespace TodoApp.Services
     {
 
         private readonly ITodoRepository _todoRepository;
+        private readonly ITagRepository _tagRepository;
 
-        public TodoService(ITodoRepository todoRepository)
+        public TodoService(ITodoRepository todoRepository, ITagRepository tagRepository)
         {
             _todoRepository = todoRepository;
+            _tagRepository = tagRepository;
         }
 
         public async Task<IEnumerable<TodoResponseDto>> GetAllTodosAsync(int userId)
@@ -41,6 +43,7 @@ namespace TodoApp.Services
                 Priority = dto.Priority,
                 IsCompleted = false,
                 UserId = userId,
+                Tags = await _tagRepository.GetByIdsAsync(dto.TagIds, userId),
                 CreatedAt = DateTime.UtcNow
             };
 

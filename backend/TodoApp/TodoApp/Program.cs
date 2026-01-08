@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TodoApp.Data;
+using TodoApp.Endpoints;
 using TodoApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,8 +28,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/todos", () => { })
-.WithName("GetTodos")
-.WithOpenApi();
+app.MapUserEndpoints()
+    .MapTodoEndpoints()
+    .MapTagEndpoints();
 
 app.Run();
