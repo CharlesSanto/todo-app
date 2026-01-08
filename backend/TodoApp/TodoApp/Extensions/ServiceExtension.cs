@@ -22,12 +22,14 @@ namespace TodoApp.Extensions
             services.AddScoped<ITodoService, TodoService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITagService, TagService>();
+            services.AddScoped<IAuthService, AuthService>();
             return services;
         }
 
         public static IServiceCollection AddSecurity(this IServiceCollection services)
         {
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            services.AddSingleton<JwtService>();
             return services;
         }
 
