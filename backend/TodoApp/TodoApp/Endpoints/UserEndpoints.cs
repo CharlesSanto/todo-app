@@ -13,7 +13,7 @@ namespace TodoApp.Endpoints
         {
             var mapGroup = app.MapGroup("/users").WithTags("Users").RequireAuthorization();
 
-            mapGroup.MapGet("/me", async (, IUserService service, ClaimsPrincipal user) =>
+            mapGroup.MapGet("/me", async (IUserService service, ClaimsPrincipal user) =>
             {
                 int userId = user.GetUserId();
 
