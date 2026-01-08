@@ -29,6 +29,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapUserEndpoints()
-    .MapTodoEndpoints();
+    .MapTodoEndpoints()
+    .MapTagEndpoints();
 
 app.Run();

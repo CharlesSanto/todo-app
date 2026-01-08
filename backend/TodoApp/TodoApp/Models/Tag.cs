@@ -9,5 +9,6 @@
         public User User { get; set; } = null!;
 
         public ICollection<Todo> Todos { get; set; } = new List<Todo>();
+
     }
 }
