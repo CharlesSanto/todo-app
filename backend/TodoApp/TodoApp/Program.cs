@@ -6,9 +6,18 @@ using System.Text;
 using TodoApp.Data;
 using TodoApp.Endpoints;
 using TodoApp.Extensions;
-using TodoApp.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Development", policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
@@ -68,7 +77,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -80,10 +88,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("Development");
+}
+
 app.UseAuthentication();    
 app.UseAuthorization();
-
-app.UseHttpsRedirection();
 
 app.MapUserEndpoints()
     .MapTodoEndpoints()

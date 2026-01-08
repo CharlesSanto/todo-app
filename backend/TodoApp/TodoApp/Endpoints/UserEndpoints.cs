@@ -2,6 +2,8 @@
 using TodoApp.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using TodoApp.Validators.UserValidators;
+using System.Security.Claims;
+using TodoApp.Extensions;
 
 namespace TodoApp.Endpoints
 {
@@ -11,12 +13,14 @@ namespace TodoApp.Endpoints
         {
             var mapGroup = app.MapGroup("/users").WithTags("Users").RequireAuthorization();
 
-            mapGroup.MapGet("/me", async (int id, IUserService service) =>
+            mapGroup.MapGet("/me", async (, IUserService service, ClaimsPrincipal user) =>
             {
-                var user = await service.GetUserByIdAsync(id);
+                int userId = user.GetUserId();
+
+                var userFound = await service.GetUserByIdAsync(userId);
 
                 return user is not null
-                    ? Results.Ok(user)
+                    ? Results.Ok(userFound)
                     : Results.NotFound();
             });
 
@@ -39,16 +43,18 @@ namespace TodoApp.Endpoints
                 }
             }).AllowAnonymous();
 
-            mapGroup.MapPatch("/{id}", async (UpdateUserDto dto, IUserService service, int id, UpdateUserValidator validator) =>
+            mapGroup.MapPatch("/", async (UpdateUserDto dto, IUserService service, UpdateUserValidator validator, ClaimsPrincipal user) =>
             {
                 try
                 {
+                    int userId = user.GetUserId();
+
                     var validation = await validator.ValidateAsync(dto);
 
                     if (!validation.IsValid)
                         return Results.ValidationProblem(validation.ToDictionary());
 
-                    var updatedUser = await service.UpdateUserAsync(id, dto);
+                    var updatedUser = await service.UpdateUserAsync(userId, dto);
 
                     return updatedUser is not null
                         ? Results.Ok(updatedUser)
@@ -59,13 +65,15 @@ namespace TodoApp.Endpoints
                     return Results.Conflict(new { message = ex.Message });
                 }
             });
-            mapGroup.MapDelete("/{id}", async (int id, IUserService service) =>
+            mapGroup.MapDelete("/", async (IUserService service, ClaimsPrincipal user) =>
             {
-                var deleted = await service.DeleteUserAsync(id);
+                int userId = user.GetUserId();
+
+                var deleted = await service.DeleteUserAsync(userId);
 
                 return deleted
                     ? Results.NoContent()
-                    : Results.NotFound(new { message = "Usuário não encontrado" });
+                    : Results.NotFound(new { message = "Usuário não encontrado." });
             });
 
             return app;
