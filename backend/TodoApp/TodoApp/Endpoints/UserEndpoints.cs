@@ -19,7 +19,7 @@ namespace TodoApp.Endpoints
 
                 var userFound = await service.GetUserByIdAsync(userId);
 
-                return user is not null
+                return userFound is not null
                     ? Results.Ok(userFound)
                     : Results.NotFound();
             });

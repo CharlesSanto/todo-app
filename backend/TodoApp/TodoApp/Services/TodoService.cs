@@ -61,7 +61,7 @@ namespace TodoApp.Services
                 todo.Title = dto.Title;
             }
 
-            if (!string.IsNullOrWhiteSpace(dto.Description))
+            if (dto.Description != null)
             {
                 todo.Description = dto.Description;
             }
