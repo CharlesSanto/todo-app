@@ -7,18 +7,19 @@ export const authService = {
     },
 
     setToken: (token) => {
-        localStorage.setItem('authToken', token);
+        localStorage.setItem('token', token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     },
 
     getToken: () => {
-        return localStorage.getItem('authToken');
+        return localStorage.getItem('token');
     },
 
     isAuthenticated: () => {
-        return !!localStorage.getItem('authToken');
+        return !!localStorage.getItem('token');
     },
 
     logout: () => {
-        localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
     }
 }
