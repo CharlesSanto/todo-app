@@ -235,7 +235,18 @@ export default function TodoPage() {
     const [isOverdueOpen, setIsOverdueOpen] = useState(true);
     const [expandedGroups, setExpandedGroups] = useState({}); 
     const [expandedDays, setExpandedDays] = useState({});
-    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+    
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        const savedState = localStorage.getItem('sidebar_state');
+        if (savedState !== null) {
+            return JSON.parse(savedState);
+        }
+        return window.innerWidth >= 768;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('sidebar_state', JSON.stringify(sidebarOpen));
+    }, [sidebarOpen]);
     
     const [activeNav, setActiveNav] = useState(() => location.state?.activeNav || 'hoje');
 
@@ -298,7 +309,7 @@ export default function TodoPage() {
         } else {
             fetchData();
         }
-    }, [isAuthenticated, fetchData, activeNav]);
+    }, [isAuthenticated, fetchData]);
 
     const handleLogout = () => { if (logout) { logout(); navigate('/login'); } };
     const toggleDay = (dateStr) => { setExpandedDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); };
