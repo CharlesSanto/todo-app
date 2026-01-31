@@ -90,10 +90,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseCors("Development");
-}
+app.UseCors("AllowAll");
 
 app.UseAuthentication();    
 app.UseAuthorization();
