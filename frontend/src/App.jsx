@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, AuthContext } from './context/AuthContext';
+import { useContext } from 'react';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import TodoPage from './pages/TodoPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+function PrivateRoute({ children }) {
+  const { signed, loading } = useContext(AuthContext);
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  if (loading) {
+    // Detecta tema do usuário
+    const isDark = (localStorage.theme === 'dark') || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return (
+      <div style={{
+        minHeight: '100vh',
+        width: '100vw',
+        background: isDark ? '#121212' : '#fff',
+        transition: 'background 0.2s',
+      }} />
+    );
+  }
+
+  return signed ? children : <Navigate to="/login" />;
 }
 
-export default App
+import SettingsPage from './pages/SettingsPage';
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route 
+            path="/" 
+            element={
+              <PrivateRoute>
+                <TodoPage />
+              </PrivateRoute>
+            } 
+          />
+          <Route
+            path="/configuracoes"
+            element={
+              <PrivateRoute>
+                <SettingsPage />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
+
+export default App;
