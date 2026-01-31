@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { todoService } from '../services/todoService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // ADICIONADO: useLocation
 import Sidebar from '../components/Sidebar';
 import TodoItem from '../components/TodoItem';
 import { Icons } from '../utils/Icons';
@@ -84,9 +84,8 @@ const WeekStrip = ({ currentDate, onDateSelect }) => {
     );
 };
 
-// --- COMPONENTE CORRIGIDO: GRÁFICO ALINHADO ---
 const ProductivityChart = ({ todos }) => {
-    const [range, setRange] = useState('7d'); // '7d', '30d', '1y', 'custom'
+    const [range, setRange] = useState('7d');
     const [customStart, setCustomStart] = useState('');
     const [customEnd, setCustomEnd] = useState('');
 
@@ -173,7 +172,6 @@ const ProductivityChart = ({ todos }) => {
                 </div>
             )}
 
-            {/* CORREÇÃO 1: Removido 'items-end' e adicionado overflow-x-auto para rolagem se necessário */}
             <div className="h-48 w-full flex gap-1 overflow-x-auto pb-2 scrollbar-hide"> 
                 {data.length === 0 ? (
                     <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm italic border-2 border-dashed border-slate-100 dark:border-[#333] rounded-lg">
@@ -183,21 +181,16 @@ const ProductivityChart = ({ todos }) => {
                     data.map((item, idx) => {
                         const heightPercentage = Math.max((item.count / maxCount) * 100, 5); 
                         const isToday = item.fullDate === new Date().toISOString().split('T')[0];
-                        
-                        // Lógica para mostrar rótulo: mostra a cada X dias para não encavalar
                         const showLabel = data.length > 15 ? idx % Math.ceil(data.length / 10) === 0 : true;
 
                         return (
                             <div key={idx} className="flex flex-col items-center flex-1 h-full min-w-[20px] group">
-                                {/* Área da Barra: flex-1 ocupa todo espaço vertical acima do rótulo */}
                                 <div className="relative w-full flex items-end justify-center flex-1 pb-2">
                                     <div className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] px-2 py-1 rounded pointer-events-none whitespace-nowrap z-20 shadow-lg">
                                         {item.count} tarefas em {item.label}
                                     </div>
                                     <div style={{ height: `${heightPercentage}%` }} className={`w-full max-w-[40px] rounded-t-[4px] transition-all duration-500 ease-out relative ${isToday ? 'bg-blue-600 dark:bg-blue-500' : 'bg-slate-200 dark:bg-[#404040] hover:bg-blue-400 dark:hover:bg-blue-600'}`}></div>
                                 </div>
-                                
-                                {/* CORREÇÃO 2: Altura fixa (h-4) para o rótulo, mesmo se vazio */}
                                 <div className="h-4 flex items-center justify-center w-full">
                                     <span className={`text-[9px] uppercase font-medium text-slate-400 dark:text-slate-500 truncate w-full text-center ${!showLabel ? 'invisible' : ''}`}>
                                         {item.label}
@@ -215,6 +208,7 @@ const ProductivityChart = ({ todos }) => {
 export default function TodoPage() {
     const { isAuthenticated, user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation(); // ADICIONADO: useLocation para ler o estado da navegação
     
     // Estados
     const [loading, setLoading] = useState(true);
@@ -226,7 +220,10 @@ export default function TodoPage() {
     const [expandedGroups, setExpandedGroups] = useState({}); 
     const [expandedDays, setExpandedDays] = useState({});
     const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
-    const [activeNav, setActiveNav] = useState('hoje');
+    
+    // CORREÇÃO: Lê o estado da navegação (vindo de Configurações) ou usa 'hoje' como padrão
+    const [activeNav, setActiveNav] = useState(() => location.state?.activeNav || 'hoje');
+
     const [formData, setFormData] = useState({ title: '', description: '', dueDate: '', priority: 0 });
     const [stripDate, setStripDate] = useState(new Date());
 

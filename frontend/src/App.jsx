@@ -15,6 +15,7 @@ function PrivateRoute({ children }) {
   return signed ? children : <Navigate to="/login" />;
 }
 
+import SettingsPage from './pages/SettingsPage';
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +30,14 @@ function App() {
                 <TodoPage />
               </PrivateRoute>
             } 
+          />
+          <Route
+            path="/configuracoes"
+            element={
+              <PrivateRoute>
+                <SettingsPage />
+              </PrivateRoute>
+            }
           />
         </Routes>
       </AuthProvider>

@@ -1,16 +1,38 @@
 import { Icons } from '../utils/Icons';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setActiveNav, user, onLogout, toggleTheme, isDarkMode }) {
+    const navigate = useNavigate();
+    const location = useLocation();
     
+    // Removemos a propriedade 'route' fixa e deixamos o Sidebar decidir como navegar
     const navItems = [
         { id: 'hoje', label: 'Hoje', icon: <Icons.Sun /> },
         { id: 'proximos', label: 'Próximos', icon: <Icons.Calendar /> },
         { id: 'concluidas', label: 'Histórico', icon: <Icons.CheckCircle /> },
-        { id: 'estatisticas', label: 'Estatísticas', icon: <Icons.BarChart /> }, // NOVO
+        { id: 'estatisticas', label: 'Estatísticas', icon: <Icons.BarChart /> },
+        { id: 'configuracoes', label: 'Configurações', icon: <Icons.Settings /> },
     ];
 
+    const handleNavigation = (itemId) => {
+        // 1. Atualiza o estado visual do botão ativo
+        setActiveNav(itemId);
+
+        // 2. Lógica de Roteamento Inteligente
+        if (itemId === 'configuracoes') {
+            // Se for configurações, vai para a rota dedicada
+            navigate('/configuracoes');
+        } else {
+            // Se for qualquer outra aba (tarefas), vai para a Home ('/')
+            // E envia o ID da aba dentro do 'state'. A TodoPage vai ler isso.
+            navigate('/', { state: { activeNav: itemId } });
+        }
+
+        // 3. Fecha sidebar no mobile
+        if (window.innerWidth < 768) setSidebarOpen(false);
+    };
+
     const SidebarContent = () => (
-        // LIGHT: bg-slate-50 border-slate-200 | DARK: bg-[#202020] border-[#2a2a2a]
         <div className="flex flex-col h-full bg-slate-50 dark:bg-[#202020] border-r border-slate-200 dark:border-[#2a2a2a] text-sm transition-colors duration-200">
             <div className="flex items-center justify-between p-5 pb-2">
                 <div className="flex items-center gap-2.5">
@@ -33,10 +55,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
                     {navItems.map((item) => (
                         <button
                             key={item.id}
-                            onClick={() => {
-                                setActiveNav(item.id);
-                                if (window.innerWidth < 768) setSidebarOpen(false);
-                            }}
+                            onClick={() => handleNavigation(item.id)}
                             className={`flex items-center gap-3 px-3 py-2 rounded-md text-[13px] transition-all duration-200 group
                                 ${activeNav === item.id 
                                     ? 'text-blue-600 bg-blue-50 dark:bg-blue-500/10 dark:text-blue-400 font-medium' 
@@ -64,7 +83,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
                     </div>
                     
                     <div className="flex items-center gap-1">
-                        {/* BOTÃO DARK MODE */}
                         <button onClick={toggleTheme} className="text-slate-400 hover:text-blue-600 dark:hover:text-yellow-400 transition-colors p-1.5 rounded hover:bg-slate-100 dark:hover:bg-[#333]" title="Alterar tema">
                             {isDarkMode ? <Icons.Sun /> : <Icons.Moon />}
                         </button>
