@@ -231,6 +231,7 @@ export default function TodoPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [titleError, setTitleError] = useState(''); 
+    const [dateError, setDateError] = useState('');
     const [isOverdueOpen, setIsOverdueOpen] = useState(true);
     const [expandedGroups, setExpandedGroups] = useState({}); 
     const [expandedDays, setExpandedDays] = useState({});
@@ -307,13 +308,36 @@ export default function TodoPage() {
     const handleResetToToday = () => { setStripDate(new Date()); scrollToDate(new Date().toLocaleDateString('en-CA')); };
     const scrollToDate = (dateStr) => { const element = document.getElementById(`group-${dateStr}`); if (element) { element.scrollIntoView({ behavior: 'smooth', block: 'start' }); setExpandedDays(prev => ({ ...prev, [dateStr]: true })); } };
 
-    const openCreateModal = (preFilledDate = null) => { setEditingTodoId(null); const defaultDate = preFilledDate || new Date().toISOString().split('T')[0]; setFormData({ title: '', description: '', dueDate: defaultDate, priority: 0 }); setIsModalOpen(true); };
-    const openEditModal = (todo) => { setEditingTodoId(todo.id); setFormData({ title: todo.title, description: todo.description || '', dueDate: todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '', priority: todo.priority }); setIsModalOpen(true); };
+    const openCreateModal = (preFilledDate = null) => {
+        setEditingTodoId(null);
+        const defaultDate = preFilledDate || new Date().toISOString().split('T')[0];
+        setFormData({ title: '', description: '', dueDate: defaultDate, priority: 0 });
+        setDateError('');
+        setIsModalOpen(true);
+    };
+    const openEditModal = (todo) => {
+        setEditingTodoId(todo.id);
+        setFormData({ title: todo.title, description: todo.description || '', dueDate: todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '', priority: todo.priority });
+        setDateError('');
+        setIsModalOpen(true);
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setTitleError('');
+        setDateError('');
         if (!formData.title.trim()) {
             setTitleError('O título é obrigatório.');
             return;
+        }
+        // Validação de data: não pode ser antes de hoje
+        if (formData.dueDate) {
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const selected = new Date(formData.dueDate + 'T00:00:00');
+            if (selected < today) {
+                setDateError('A data não pode ser anterior ao dia atual.');
+                return;
+            }
         }
         try {
             const dueDateUtc = formData.dueDate ? new Date(formData.dueDate + 'T00:00:00').toISOString() : null;
@@ -508,11 +532,26 @@ export default function TodoPage() {
                                 {titleError && <span className="text-xs text-red-500">{titleError}</span>}
                                 <textarea name="description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full text-sm text-slate-500 dark:text-slate-400 placeholder-slate-300 dark:placeholder-slate-500 border-none outline-none focus:ring-0 p-0 resize-none h-24 bg-transparent" placeholder="Descrição" />
                                 <div className="flex gap-2 pt-2 items-center">
-                                    <div className="relative w-40"><CustomDatePicker selectedDate={formData.dueDate} onChange={(val) => setFormData({...formData, dueDate: val})} /></div>
+                                    <div className="relative w-40">
+                                        <CustomDatePicker
+                                            selectedDate={formData.dueDate}
+                                            onChange={(val) => {
+                                                setFormData({ ...formData, dueDate: val });
+                                                if (!val) setDateError('');
+                                                else {
+                                                    const today = new Date();
+                                                    today.setHours(0,0,0,0);
+                                                    const selected = new Date(val + 'T00:00:00');
+                                                    if (selected >= today) setDateError('');
+                                                }
+                                            }}
+                                        />
+                                        {dateError && <span className="text-xs text-red-500 block mt-1">{dateError}</span>}
+                                    </div>
                                     <PriorityDropdown value={formData.priority} onChange={(val) => setFormData({...formData, priority: val})} />
                                 </div>
                                 <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-[#444] mt-2">
-                                    <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-white dark:bg-[#333] hover:bg-slate-50 dark:hover:bg-[#444] rounded-lg text-xs font-medium text-slate-500 dark:text-slate-300 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-[#555]">Cancelar</button>
+                                    <button type="button" onClick={() => { setIsModalOpen(false); setDateError(''); }} className="px-4 py-2 bg-white dark:bg-[#333] hover:bg-slate-50 dark:hover:bg-[#444] rounded-lg text-xs font-medium text-slate-500 dark:text-slate-300 transition-colors border border-transparent hover:border-slate-200 dark:hover:border-[#555]">Cancelar</button>
                                     <button type="submit" className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#4F46E5] hover:bg-[#4338ca] transition-colors shadow-md shadow-indigo-100 dark:shadow-none disabled:opacity-50" disabled={!formData.title}>Adicionar tarefa</button>
                                 </div>
                             </form>
