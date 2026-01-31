@@ -1,29 +1,34 @@
-# Acesse https://aka.ms/customizecontainer para saber como personalizar seu contêiner de depuração e como o Visual Studio usa este Dockerfile para criar suas imagens para uma depuração mais rápida.
-
-# Esta fase é usada durante a execução no VS no modo rápido (Padrão para a configuração de Depuração)
+# Imagem base
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
-
-# Esta fase é usada para compilar o projeto de serviço
+# Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["TodoApp/TodoApp.csproj", "TodoApp/"]
-RUN dotnet restore "./TodoApp/TodoApp.csproj"
-COPY . .
-WORKDIR "/src/TodoApp"
-RUN dotnet build "./TodoApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Esta fase é usada para publicar o projeto de serviço a ser copiado para a fase final
+# --- CORREÇÃO AQUI ---
+# Ajustamos o caminho para descer dois níveis de pasta: TodoApp/TodoApp/
+COPY ["TodoApp/TodoApp/TodoApp.csproj", "TodoApp/TodoApp/"]
+
+# Ajustamos o restore para o caminho correto
+RUN dotnet restore "TodoApp/TodoApp/TodoApp.csproj"
+
+# Copia todo o resto
+COPY . .
+
+# Entramos na pasta correta para rodar o build
+WORKDIR "/src/TodoApp/TodoApp"
+
+RUN dotnet build "TodoApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# Publish
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./TodoApp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "TodoApp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# Esta fase é usada na produção ou quando executada no VS no modo normal (padrão quando não está usando a configuração de Depuração)
+# Final
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
