@@ -8,23 +8,19 @@ import { Icons } from '../utils/Icons';
 export default function SettingsPage() {
     const { user, setUser, logout } = useContext(AuthContext);
     
-    // Estados do formulário
     const [name, setName] = useState(user?.name || '');
     const [email, setEmail] = useState(user?.email || '');
     
-    // Estados de UI
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
     const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
     const [activeNav, setActiveNav] = useState('configuracoes');
     
-    // Estado do Modal de Exclusão
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     
     const navigate = useNavigate();
 
-    // Lógica do Tema
     const [isDarkMode, setIsDarkMode] = useState(() => {
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) return true;
         return false;
@@ -38,7 +34,6 @@ export default function SettingsPage() {
     const toggleTheme = () => setIsDarkMode(!isDarkMode);
     const handleLogout = () => { if (logout) { logout(); navigate('/login'); } };
 
-    // Handler de update
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -59,7 +54,6 @@ export default function SettingsPage() {
         }
     };
 
-    // Função real de deletar (chamada pelo Modal)
     const confirmDeleteAccount = async () => {
         try {
             await userService.deleteUser();
@@ -74,7 +68,6 @@ export default function SettingsPage() {
     return (
         <div className="flex min-h-screen bg-slate-50 dark:bg-[#121212] transition-colors duration-200 relative">
             
-            {/* --- MODAL DE CONFIRMAÇÃO --- */}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                     <div 
@@ -143,7 +136,6 @@ export default function SettingsPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         
-                        {/* CARD: Informações Básicas */}
                         <div className="bg-white dark:bg-[#202020] rounded-xl border border-slate-200 dark:border-[#2a2a2a] p-6 shadow-sm">
                             <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 uppercase tracking-wider text-[11px]">Perfil</h2>
                             <div className="space-y-4">
@@ -170,7 +162,6 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        {/* Botão Salvar */}
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                             <div className="text-sm">
                                 {success && <span className="text-green-600 font-medium flex items-center gap-1"><Icons.CheckCircle size={16} /> Salvo com sucesso!</span>}
@@ -186,7 +177,6 @@ export default function SettingsPage() {
                         </div>
                     </form>
 
-                    {/* CARD: Zona de Perigo */}
                     <div className="mt-10 border-t border-slate-200 dark:border-[#2a2a2a] pt-8">
                         <div className="bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/20 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div>

@@ -48,10 +48,8 @@ export default function TodoItem({ todo, isOverdue, onEdit, onToggle, onDelete }
                     </p>
                 )}
 
-                {/* --- ÁREA DE TAGS E DATA --- */}
                 <div className="flex flex-wrap items-center gap-2 mt-2">
                     
-                    {/* Renderiza as Tags se existirem */}
                     {todo.tags && todo.tags.length > 0 && (
                         <div className="flex gap-1">
                             {todo.tags.map((tag, idx) => (
@@ -64,7 +62,6 @@ export default function TodoItem({ todo, isOverdue, onEdit, onToggle, onDelete }
 
                     {todo.dueDate && (
                         <div className={`flex items-center gap-1 text-[10px] ${isOverdue && !todo.isCompleted ? 'text-red-500 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
-                            {(!todo.tags || todo.tags.length === 0) && <Icons.Calendar />} {/* Mostra ícone só se não tiver tags para poupar espaço */}
                             {new Date(todo.dueDate).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'})}
                         </div>
                     )}

@@ -69,7 +69,6 @@ export default function LoginPage() {
           <p className="text-text-muted">Faça login para organizar suas tarefas</p>
         </div>
 
-        {/* Mostra o erro sempre que ele existir */}
         {error && (
           <div className="mb-6 p-4 rounded-lg bg-red-50 border border-danger/20 flex items-center gap-3 text-danger animate-pulse-once">
             <AlertIcon />

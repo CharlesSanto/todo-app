@@ -5,7 +5,6 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
     const navigate = useNavigate();
     const location = useLocation();
     
-    // Removemos a propriedade 'route' fixa e deixamos o Sidebar decidir como navegar
     const navItems = [
         { id: 'hoje', label: 'Hoje', icon: <Icons.Sun /> },
         { id: 'proximos', label: 'Próximos', icon: <Icons.Calendar /> },
@@ -15,20 +14,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeNav, setAct
     ];
 
     const handleNavigation = (itemId) => {
-        // 1. Atualiza o estado visual do botão ativo
         setActiveNav(itemId);
 
-        // 2. Lógica de Roteamento Inteligente
         if (itemId === 'configuracoes') {
-            // Se for configurações, vai para a rota dedicada
             navigate('/configuracoes');
         } else {
-            // Se for qualquer outra aba (tarefas), vai para a Home ('/')
-            // E envia o ID da aba dentro do 'state'. A TodoPage vai ler isso.
             navigate('/', { state: { activeNav: itemId } });
         }
 
-        // 3. Fecha sidebar no mobile
         if (window.innerWidth < 768) setSidebarOpen(false);
     };
 

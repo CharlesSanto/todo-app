@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { userService } from '../services/userService';
 
-// Spinner igual ao do LoginPage
 const SpinnerIcon = () => (
   <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -116,7 +115,6 @@ export default function Register() {
         )}
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           
-          {/* Campo Nome */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-text-main mb-1">
               Nome Completo
@@ -129,11 +127,9 @@ export default function Register() {
               className={getInputClass(errors.name)}
               placeholder="Ex: Charles Oliveira"
             />
-            {/* Mensagem de Erro Condicional */}
             {errors.name && <span className="text-xs text-danger mt-1 block">{errors.name}</span>}
           </div>
 
-          {/* Campo Email */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-text-main mb-1">
               Email
@@ -151,7 +147,6 @@ export default function Register() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            {/* Senha */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-text-main mb-1">
                 Senha
@@ -167,7 +162,6 @@ export default function Register() {
               {errors.password && <span className="text-xs text-danger mt-1 block">{errors.password}</span>}
             </div>
 
-            {/* Confirmar Senha */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-main mb-1">
                 Confirmar Senha

@@ -1,5 +1,4 @@
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
-// Spinner igual ao do LoginPage
 const SpinnerIcon = () => (
     <svg className="animate-spin h-8 w-8 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -217,7 +216,6 @@ export default function TodoPage() {
     const navigate = useNavigate();
     const location = useLocation()
     
-    // Estados
     const [loading, setLoading] = useState(true);
     const [todos, setTodos] = useState(() => {
         const cached = localStorage.getItem('todos_cache');
@@ -238,7 +236,6 @@ export default function TodoPage() {
     const [expandedDays, setExpandedDays] = useState({});
     const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
     
-    // CORREÇÃO: Lê o estado da navegação (vindo de Configurações) ou usa 'hoje' como padrão
     const [activeNav, setActiveNav] = useState(() => location.state?.activeNav || 'hoje');
 
     const [formData, setFormData] = useState({ title: '', description: '', dueDate: '', priority: 0 });
@@ -256,7 +253,6 @@ export default function TodoPage() {
 
     const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
-    // Função para verificar se houve mudança nos dados
     const isTodosChanged = (oldTodos, newTodos) => {
         return JSON.stringify(oldTodos) !== JSON.stringify(newTodos);
     };
@@ -264,13 +260,11 @@ export default function TodoPage() {
     const fetchData = useCallback(async (force = false) => {
         setLoading(true);
         try {
-            // Se não for forçado, tenta usar o cache
             if (!force) {
                 const cached = localStorage.getItem('todos_cache');
                 const cachedTime = localStorage.getItem('todos_cache_time');
                 if (cached && cachedTime) {
                     const now = Date.now();
-                    // Cache válido por 60 segundos
                     if (now - Number(cachedTime) < 60000) {
                         setTodos(JSON.parse(cached));
                         setLoading(false);
@@ -279,7 +273,6 @@ export default function TodoPage() {
                 }
             }
             const todosData = await todoService.getTodos();
-            // Só atualiza o cache se mudou
             const cached = localStorage.getItem('todos_cache');
             if (!cached || isTodosChanged(JSON.parse(cached), todosData)) {
                 localStorage.setItem('todos_cache', JSON.stringify(todosData));
@@ -295,7 +288,6 @@ export default function TodoPage() {
 
     useEffect(() => {
         if (!isAuthenticated) return;
-        // Sempre usa o cache instantâneo ao montar ou ao mudar activeNav
         const cached = localStorage.getItem('todos_cache');
         const cachedTime = localStorage.getItem('todos_cache_time');
         const now = Date.now();
@@ -317,7 +309,6 @@ export default function TodoPage() {
 
     const openCreateModal = (preFilledDate = null) => { setEditingTodoId(null); const defaultDate = preFilledDate || new Date().toISOString().split('T')[0]; setFormData({ title: '', description: '', dueDate: defaultDate, priority: 0 }); setIsModalOpen(true); };
     const openEditModal = (todo) => { setEditingTodoId(todo.id); setFormData({ title: todo.title, description: todo.description || '', dueDate: todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '', priority: todo.priority }); setIsModalOpen(true); };
-    // Otimista: Adicionar/Editar
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.title.trim()) {
@@ -327,7 +318,6 @@ export default function TodoPage() {
         try {
             const dueDateUtc = formData.dueDate ? new Date(formData.dueDate + 'T00:00:00').toISOString() : null;
             const payload = { ...formData, description: formData.description || '', priority: parseInt(formData.priority), dueDate: dueDateUtc, TagIds: [] };
-            // Fecha o modal imediatamente para resposta instantânea
             setIsModalOpen(false);
             if (editingTodoId) {
                 setTodos(prev => {
@@ -369,28 +359,22 @@ export default function TodoPage() {
         }
     };
 
-    // Otimista: Deletar
     const handleDelete = async (id) => {
-        // Remove localmente antes do backend
         setTodos(prev => prev.filter(t => t.id !== id));
         try {
             await todoService.deleteTodo(id);
-            // Atualiza cache
             localStorage.setItem('todos_cache', JSON.stringify(todos.filter(t => t.id !== id)));
             localStorage.setItem('todos_cache_time', Date.now().toString());
         } catch (error) {
-            // Reverte se falhar
             await fetchData(true);
             console.error(error);
         }
     };
 
-    // Otimista: Completar
     const handleToggleComplete = async (todoId, currentValue) => {
         setTodos(prev => prev.map(t => t.id === todoId ? { ...t, isCompleted: !currentValue } : t));
         try {
             await todoService.updateTodo(todoId, { isCompleted: !currentValue });
-            // Atualiza cache
             localStorage.setItem('todos_cache', JSON.stringify(todos.map(t => t.id === todoId ? { ...t, isCompleted: !currentValue } : t)));
             localStorage.setItem('todos_cache_time', Date.now().toString());
         } catch (error) {
@@ -420,14 +404,12 @@ export default function TodoPage() {
             <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeNav={activeNav} setActiveNav={setActiveNav} user={user} onLogout={handleLogout} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
 
             <main className="flex-1 max-w-4xl w-full mx-auto p-6 md:px-16 md:py-12 overflow-y-auto">
-                {/* VIEW: ESTATÍSTICAS (NOVO) */}
                 {activeNav === 'estatisticas' ? (
                     <div className="animate-in fade-in zoom-in-95 duration-300">
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">Estatísticas</h2>
                             <p className="text-slate-500 dark:text-slate-400 text-sm">Acompanhe seu progresso ao longo da semana.</p>
                         </div>
-                        {/* Gráfico de Barras Customizado */}
                         <ProductivityChart todos={todos} />
                     </div>
                 ) : activeNav === 'proximos' ? (
