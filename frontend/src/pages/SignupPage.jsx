@@ -125,7 +125,7 @@ export default function Register() {
               value={formData.name}
               onChange={handleChange}
               className={getInputClass(errors.name)}
-              placeholder="Ex: Charles Oliveira"
+              placeholder=""
             />
             {errors.name && <span className="text-xs text-danger mt-1 block">{errors.name}</span>}
           </div>
