@@ -49,7 +49,11 @@ export default function SettingsPage() {
             setUser(updated);
             setSuccess(true);
         } catch (err) {
-            setError('Erro ao atualizar perfil.');
+            if (err.response && err.response.data && err.response.data.message) {
+                setError(err.response.data.message);
+            } else {
+                setError('Erro ao atualizar perfil.');
+            }
         } finally {
             setLoading(false);
         }
@@ -58,8 +62,8 @@ export default function SettingsPage() {
     // Função real de deletar (chamada pelo Modal)
     const confirmDeleteAccount = async () => {
         try {
-            // await userService.deleteAccount(); 
-            console.log('Conta deletada');
+            await userService.deleteUser();
+            setShowDeleteModal(false);
             handleLogout();
         } catch (err) {
             setError('Erro ao deletar conta');
@@ -177,7 +181,7 @@ export default function SettingsPage() {
                                 disabled={loading}
                                 className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
                             >
-                                {loading ? 'Salvando...' : 'Salvar Alterações'}
+                                {loading ? 'Salvando...' : 'Salvar'}
                             </button>
                         </div>
                     </form>

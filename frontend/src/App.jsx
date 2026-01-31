@@ -9,7 +9,16 @@ function PrivateRoute({ children }) {
   const { signed, loading } = useContext(AuthContext);
 
   if (loading) {
-    return <div>Loading...</div>;
+    // Detecta tema do usuário
+    const isDark = (localStorage.theme === 'dark') || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return (
+      <div style={{
+        minHeight: '100vh',
+        width: '100vw',
+        background: isDark ? '#121212' : '#fff',
+        transition: 'background 0.2s',
+      }} />
+    );
   }
 
   return signed ? children : <Navigate to="/login" />;

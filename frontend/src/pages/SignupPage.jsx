@@ -1,6 +1,15 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { userService } from '../services/userService';
+
+// Spinner igual ao do LoginPage
+const SpinnerIcon = () => (
+  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+);
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -13,6 +22,7 @@ export default function Register() {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -49,37 +59,40 @@ export default function Register() {
     e.preventDefault();
 
     if (validateForm()) {
-        try {
-          const { confirmPassword, ...userData } = formData;
-          const payload = {
-            ...userData,
-            passwordConfirmed: formData.confirmPassword
-          };
-          payload.PasswordConfirmed = payload.passwordConfirmed;
-          delete payload.passwordConfirmed;
+      setLoading(true);
+      try {
+        const { confirmPassword, ...userData } = formData;
+        const payload = {
+          ...userData,
+          passwordConfirmed: formData.confirmPassword
+        };
+        payload.PasswordConfirmed = payload.passwordConfirmed;
+        delete payload.passwordConfirmed;
 
-          await userService.createUser(payload);
-          navigate('/login');
-        } catch (error) {
-          if (error.response?.data?.errors) {
-            const apiErrors = error.response.data.errors;
-            const newErrors = {};
-
-            Object.keys(apiErrors).forEach(key => {
-              const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
-              if (apiErrors[key]?.[0]) {
-                newErrors[fieldName] = apiErrors[key][0];
-              }
-              if (key === 'PasswordConfirmed' && apiErrors[key]?.[0]) {
-                newErrors.confirmPassword = apiErrors[key][0];
-              }
-            });
-
-            setErrors(prev => ({ ...prev, ...newErrors }));
-          } else {
-            setErrors(prev => ({ ...prev, general: 'Ocorreu um erro inesperado. Tente novamente.' }));
-          }
+        await userService.createUser(payload);
+        navigate('/login');
+      } catch (error) {
+        if (error.response?.data?.errors) {
+          const apiErrors = error.response.data.errors;
+          const newErrors = {};
+          Object.keys(apiErrors).forEach(key => {
+            const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
+            if (apiErrors[key]?.[0]) {
+              newErrors[fieldName] = apiErrors[key][0];
+            }
+            if (key === 'PasswordConfirmed' && apiErrors[key]?.[0]) {
+              newErrors.confirmPassword = apiErrors[key][0];
+            }
+          });
+          setErrors(prev => ({ ...prev, ...newErrors }));
+        } else if (error.response?.data?.message) {
+          setErrors(prev => ({ ...prev, general: error.response.data.message }));
+        } else {
+          setErrors(prev => ({ ...prev, general: 'Ocorreu um erro inesperado. Tente novamente.' }));
         }
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -173,10 +186,17 @@ export default function Register() {
 
           <button 
             type="submit"
-            className="w-full py-3 px-4 bg-primary hover:bg-primary-hover text-white font-semibold 
-                rounded-lg shadow-md hover:shadow-lg transition-all transform active:scale-95 mt-6"
+            disabled={loading}
+            className={`w-full py-3 px-4 text-white font-semibold rounded-lg shadow-md transition-all mt-6
+              ${loading 
+                ? 'bg-primary/70 cursor-not-allowed' 
+                : 'bg-primary hover:bg-primary-hover active:scale-95'}`}
           >
-            Cadastrar
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <SpinnerIcon /> Cadastrando...
+              </span>
+            ) : "Cadastrar"}
           </button>
         </form>
 

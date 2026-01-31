@@ -1,7 +1,14 @@
 import { useContext, useState, useEffect, useCallback, useRef } from 'react';
+// Spinner igual ao do LoginPage
+const SpinnerIcon = () => (
+    <svg className="animate-spin h-8 w-8 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+);
 import { AuthContext } from '../context/AuthContext';
 import { todoService } from '../services/todoService';
-import { useNavigate, useLocation } from 'react-router-dom'; // ADICIONADO: useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import TodoItem from '../components/TodoItem';
 import { Icons } from '../utils/Icons';
@@ -208,11 +215,21 @@ const ProductivityChart = ({ todos }) => {
 export default function TodoPage() {
     const { isAuthenticated, user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
-    const location = useLocation(); // ADICIONADO: useLocation para ler o estado da navegação
+    const location = useLocation()
     
     // Estados
     const [loading, setLoading] = useState(true);
-    const [todos, setTodos] = useState([]);
+    const [todos, setTodos] = useState(() => {
+        const cached = localStorage.getItem('todos_cache');
+        if (cached) {
+            try {
+                return JSON.parse(cached);
+            } catch {
+                return [];
+            }
+        }
+        return [];
+    });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTodoId, setEditingTodoId] = useState(null);
     const [titleError, setTitleError] = useState(''); 
@@ -239,10 +256,56 @@ export default function TodoPage() {
 
     const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true); try { const todosData = await todoService.getTodos(); setTodos(todosData); } catch (err) { console.error(err); } finally { setLoading(false); }
+    // Função para verificar se houve mudança nos dados
+    const isTodosChanged = (oldTodos, newTodos) => {
+        return JSON.stringify(oldTodos) !== JSON.stringify(newTodos);
+    };
+
+    const fetchData = useCallback(async (force = false) => {
+        setLoading(true);
+        try {
+            // Se não for forçado, tenta usar o cache
+            if (!force) {
+                const cached = localStorage.getItem('todos_cache');
+                const cachedTime = localStorage.getItem('todos_cache_time');
+                if (cached && cachedTime) {
+                    const now = Date.now();
+                    // Cache válido por 60 segundos
+                    if (now - Number(cachedTime) < 60000) {
+                        setTodos(JSON.parse(cached));
+                        setLoading(false);
+                        return;
+                    }
+                }
+            }
+            const todosData = await todoService.getTodos();
+            // Só atualiza o cache se mudou
+            const cached = localStorage.getItem('todos_cache');
+            if (!cached || isTodosChanged(JSON.parse(cached), todosData)) {
+                localStorage.setItem('todos_cache', JSON.stringify(todosData));
+                localStorage.setItem('todos_cache_time', Date.now().toString());
+            }
+            setTodos(todosData);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     }, []);
-    useEffect(() => { if (isAuthenticated) fetchData(); }, [isAuthenticated, fetchData]);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        // Sempre usa o cache instantâneo ao montar ou ao mudar activeNav
+        const cached = localStorage.getItem('todos_cache');
+        const cachedTime = localStorage.getItem('todos_cache_time');
+        const now = Date.now();
+        if (cached && cachedTime && now - Number(cachedTime) < 60000) {
+            setTodos(JSON.parse(cached));
+            setLoading(false);
+        } else {
+            fetchData();
+        }
+    }, [isAuthenticated, fetchData, activeNav]);
 
     const handleLogout = () => { if (logout) { logout(); navigate('/login'); } };
     const toggleDay = (dateStr) => { setExpandedDays(prev => ({ ...prev, [dateStr]: !prev[dateStr] })); };
@@ -254,9 +317,87 @@ export default function TodoPage() {
 
     const openCreateModal = (preFilledDate = null) => { setEditingTodoId(null); const defaultDate = preFilledDate || new Date().toISOString().split('T')[0]; setFormData({ title: '', description: '', dueDate: defaultDate, priority: 0 }); setIsModalOpen(true); };
     const openEditModal = (todo) => { setEditingTodoId(todo.id); setFormData({ title: todo.title, description: todo.description || '', dueDate: todo.dueDate ? new Date(todo.dueDate).toISOString().split('T')[0] : '', priority: todo.priority }); setIsModalOpen(true); };
-    const handleSubmit = async (e) => { e.preventDefault(); if (!formData.title.trim()) { setTitleError('O título é obrigatório.'); return; } try { const dueDateUtc = formData.dueDate ? new Date(formData.dueDate + 'T00:00:00').toISOString() : null; const payload = { ...formData, description: formData.description || '', priority: parseInt(formData.priority), dueDate: dueDateUtc, TagIds: [] }; if (editingTodoId) await todoService.updateTodo(editingTodoId, payload); else await todoService.createTodo(payload); await fetchData(); setIsModalOpen(false); } catch (error) { console.error(error); } };
-    const handleDelete = async (id) => { try { await todoService.deleteTodo(id); await fetchData(); } catch (error) { console.error(error); } };
-    const handleToggleComplete = async (todoId, currentValue) => { try { await todoService.updateTodo(todoId, { isCompleted: !currentValue }); setTodos(prev => prev.map(t => t.id === todoId ? { ...t, isCompleted: !currentValue } : t)); } catch (error) { console.error(error); } };
+    // Otimista: Adicionar/Editar
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.title.trim()) {
+            setTitleError('O título é obrigatório.');
+            return;
+        }
+        try {
+            const dueDateUtc = formData.dueDate ? new Date(formData.dueDate + 'T00:00:00').toISOString() : null;
+            const payload = { ...formData, description: formData.description || '', priority: parseInt(formData.priority), dueDate: dueDateUtc, TagIds: [] };
+            // Fecha o modal imediatamente para resposta instantânea
+            setIsModalOpen(false);
+            if (editingTodoId) {
+                setTodos(prev => {
+                    const updated = prev.map(t => t.id === editingTodoId ? { ...t, ...payload } : t);
+                    localStorage.setItem('todos_cache', JSON.stringify(updated));
+                    localStorage.setItem('todos_cache_time', Date.now().toString());
+                    return updated;
+                });
+                await todoService.updateTodo(editingTodoId, payload);
+            } else {
+                const tempId = 'temp-' + Date.now();
+                const optimisticTodo = { ...payload, id: tempId, isCompleted: false };
+                setTodos(prev => {
+                    const updated = [optimisticTodo, ...prev];
+                    localStorage.setItem('todos_cache', JSON.stringify(updated));
+                    localStorage.setItem('todos_cache_time', Date.now().toString());
+                    return updated;
+                });
+                try {
+                    const created = await todoService.createTodo(payload);
+                    setTodos(prev => {
+                        const updated = prev.map(t => t.id === tempId ? { ...created } : t);
+                        localStorage.setItem('todos_cache', JSON.stringify(updated));
+                        localStorage.setItem('todos_cache_time', Date.now().toString());
+                        return updated;
+                    });
+                } catch (err) {
+                    setTodos(prev => {
+                        const updated = prev.filter(t => t.id !== tempId);
+                        localStorage.setItem('todos_cache', JSON.stringify(updated));
+                        localStorage.setItem('todos_cache_time', Date.now().toString());
+                        return updated;
+                    });
+                    throw err;
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    // Otimista: Deletar
+    const handleDelete = async (id) => {
+        // Remove localmente antes do backend
+        setTodos(prev => prev.filter(t => t.id !== id));
+        try {
+            await todoService.deleteTodo(id);
+            // Atualiza cache
+            localStorage.setItem('todos_cache', JSON.stringify(todos.filter(t => t.id !== id)));
+            localStorage.setItem('todos_cache_time', Date.now().toString());
+        } catch (error) {
+            // Reverte se falhar
+            await fetchData(true);
+            console.error(error);
+        }
+    };
+
+    // Otimista: Completar
+    const handleToggleComplete = async (todoId, currentValue) => {
+        setTodos(prev => prev.map(t => t.id === todoId ? { ...t, isCompleted: !currentValue } : t));
+        try {
+            await todoService.updateTodo(todoId, { isCompleted: !currentValue });
+            // Atualiza cache
+            localStorage.setItem('todos_cache', JSON.stringify(todos.map(t => t.id === todoId ? { ...t, isCompleted: !currentValue } : t)));
+            localStorage.setItem('todos_cache_time', Date.now().toString());
+        } catch (error) {
+            await fetchData(true);
+            console.error(error);
+        }
+    };
 
     const todayStr = new Date().toISOString().split('T')[0];
     const sortTodos = (list) => list.sort((a, b) => { const dateA = a.dueDate ? new Date(a.dueDate).getTime() : 0; const dateB = b.dueDate ? new Date(b.dueDate).getTime() : 0; if (dateA !== dateB) return dateA - dateB; return (b.priority ?? 0) - (a.priority ?? 0); });
@@ -309,9 +450,12 @@ export default function TodoPage() {
                     </div>
                 )}
 
-                {loading ? <div className="py-20 text-center text-slate-400">Carregando...</div> : (
+                                {loading && todos.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-32">
+                                        <SpinnerIcon />
+                                    </div>
+                                ) : (
                     <div className="space-y-10">
-                        {/* VIEW: ESTATÍSTICAS JÁ É TRATADA ACIMA, AQUI FICA O RESTO */}
                         {activeNav === 'estatisticas' ? null : activeNav === 'concluidas' ? (
                             <div>
                                 {Object.keys(groupedCompletedTodos).length === 0 ? <p className="text-slate-500 dark:text-slate-400 text-center py-10 font-light text-sm">Sem tarefas concluídas.</p> : 
