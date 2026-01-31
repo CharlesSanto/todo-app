@@ -1,16 +1,65 @@
-# React + Vite
+# Todo App Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é o frontend do Todo App, desenvolvido em React com Vite, Tailwind CSS e integração com uma API backend.
 
-Currently, two official plugins are available:
+## Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Autenticação de usuário (login, cadastro, logout)
+- CRUD de tarefas (criar, listar, editar, excluir)
+- Atualização otimista e cache local
+- Filtros: Hoje, Em breve, Concluídas, Estatísticas
+- Marcação de prioridade e datas
+- Interface responsiva (mobile/desktop)
+- Tema claro/escuro
+- Sidebar com navegação
+- Feedback visual com loading/spinner
 
-## React Compiler
+## Estrutura de Pastas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+frontend/
+  public/
+  src/
+    assets/           # Imagens e ícones
+    components/       # Componentes reutilizáveis (Sidebar, TodoItem, etc)
+    context/          # Contexto de autenticação
+    pages/            # Páginas principais (TodoPage, LoginPage, etc)
+    services/         # Serviços de API (todoService, authService, etc)
+    utils/            # Utilitários e helpers
+  index.html
+  package.json
+  tailwind.config.js
+  vite.config.js
+```
 
-## Expanding the ESLint configuration
+## Instalação e Execução
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Instale as dependências:
+   ```bash
+   npm install
+   ```
+2. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm run dev
+   ```
+3. Acesse em [http://localhost:5173](http://localhost:5173)
+
+> Certifique-se de que o backend está rodando e configurado para aceitar requisições do frontend.
+
+## Configuração
+
+- As URLs da API estão em `src/services/*.js`.
+- Variáveis de ambiente podem ser configuradas em `.env` se necessário.
+
+## Scripts Disponíveis
+
+- `npm run dev` — Inicia o servidor de desenvolvimento
+- `npm run build` — Gera build de produção
+- `npm run preview` — Visualiza build de produção localmente
+
+## Tecnologias Utilizadas
+
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Axios](https://axios-http.com/)
