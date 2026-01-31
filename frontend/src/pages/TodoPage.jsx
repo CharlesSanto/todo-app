@@ -403,7 +403,7 @@ export default function TodoPage() {
             <button className={`fixed top-4 left-4 z-50 p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg hover:bg-blue-50 dark:hover:bg-[#333] ${sidebarOpen ? 'md:hidden' : 'block'}`} onClick={() => setSidebarOpen(true)}><Icons.Menu /></button>
             <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} activeNav={activeNav} setActiveNav={setActiveNav} user={user} onLogout={handleLogout} toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
 
-            <main className="flex-1 max-w-4xl w-full mx-auto p-6 md:px-16 md:py-12 overflow-y-auto">
+            <main className="flex-1 max-w-4xl w-full mx-auto px-6 pb-6 pt-20 md:px-16 md:py-12 overflow-y-auto">
                 {activeNav === 'estatisticas' ? (
                     <div className="animate-in fade-in zoom-in-95 duration-300">
                         <div className="mb-8">

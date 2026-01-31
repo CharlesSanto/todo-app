@@ -70,7 +70,7 @@ export default function TodoItem({ todo, isOverdue, onEdit, onToggle, onDelete }
             
             <button 
                 onClick={() => onDelete(todo.id)} 
-                className="text-slate-400 dark:text-slate-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all ml-2 opacity-0 group-hover:opacity-100"
+                className="text-slate-400 dark:text-slate-600 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all ml-2 opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 title="Excluir"
             >
                 <Icons.Trash />
