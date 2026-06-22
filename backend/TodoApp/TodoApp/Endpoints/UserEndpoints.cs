@@ -15,7 +15,7 @@ namespace TodoApp.Endpoints
 
             mapGroup.MapGet("/me", async (IUserService service, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var userFound = await service.GetUserByIdAsync(userId);
 
@@ -47,7 +47,7 @@ namespace TodoApp.Endpoints
             {
                 try
                 {
-                    int userId = user.GetUserId();
+                    Guid userId = user.GetUserId();
 
                     var validation = await validator.ValidateAsync(dto);
 
@@ -67,7 +67,7 @@ namespace TodoApp.Endpoints
             });
             mapGroup.MapDelete("/", async (IUserService service, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var deleted = await service.DeleteUserAsync(userId);
 

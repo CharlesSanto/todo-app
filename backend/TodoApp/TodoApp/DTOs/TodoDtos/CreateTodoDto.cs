@@ -8,7 +8,7 @@ namespace TodoApp.DTOs.TodoDtos
         public string? Description { get; set; }
         public DateTime? DueDate { get; set; }
         public Priority Priority { get; set; } = Priority.None;
-        public List<int> TagIds { get; set; } = [];
+        public List<Guid> TagIds { get; set; } = new List<Guid>();
 
     }
 }

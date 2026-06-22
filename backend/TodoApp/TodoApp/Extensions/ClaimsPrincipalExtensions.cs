@@ -4,11 +4,11 @@ namespace TodoApp.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-         public static int GetUserId(this ClaimsPrincipal user)
+         public static Guid GetUserId(this ClaimsPrincipal user)
         {
             var id = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (int.TryParse(id, out var userId))
+            if (Guid.TryParse(id, out var userId))
             {
                 return userId;
             }

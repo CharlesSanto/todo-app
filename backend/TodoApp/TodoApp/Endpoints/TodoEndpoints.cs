@@ -14,16 +14,16 @@ namespace TodoApp.Endpoints
 
             mapGroup.MapGet("/", async (ITodoService service, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var todos = await service.GetAllTodosAsync(userId);
 
                 return Results.Ok(todos);
             });
 
-            mapGroup.MapGet("/{id}", async (int id, ITodoService service, ClaimsPrincipal user) =>
+            mapGroup.MapGet("/{id:guid}", async (Guid id, ITodoService service, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var todo = await service.GetTodoByIdAsync(id, userId);
 
@@ -34,7 +34,7 @@ namespace TodoApp.Endpoints
 
             mapGroup.MapPost("/", async (ITodoService service, CreateTodoDto dto, CreateTodoDtoValidator validator, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var validation = await validator.ValidateAsync(dto);
 
@@ -46,9 +46,9 @@ namespace TodoApp.Endpoints
                 return Results.Created($"/todos/{newTodo.Id}", newTodo);
             });
 
-            mapGroup.MapPatch("/{id}", async (int id, ITodoService service, UpdateTodoDto dto, UpdateTodoDtoValidator validator, ClaimsPrincipal user) =>
+            mapGroup.MapPatch("/{id:guid}", async (Guid id, ITodoService service, UpdateTodoDto dto, UpdateTodoDtoValidator validator, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var validation = await validator.ValidateAsync(dto);
 
@@ -63,9 +63,9 @@ namespace TodoApp.Endpoints
 
             });
 
-            mapGroup.MapDelete("/{id}", async (int id, ITodoService service, ClaimsPrincipal user) =>
+            mapGroup.MapDelete("/{id:guid}", async (Guid id, ITodoService service, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var deleted = await service.DeleteTodoAsync(id, userId);
 

@@ -14,7 +14,7 @@ namespace TodoApp.Endpoints
 
             mapGroup.MapGet("/", async (ITagService tagService, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var tags = await tagService.GetAllTagsAsync(userId);
 
@@ -25,7 +25,7 @@ namespace TodoApp.Endpoints
             {
                 try
                 {
-                    int userId = user.GetUserId();
+                    Guid userId = user.GetUserId();
 
                     var validationResult = await validator.ValidateAsync(tagCreateDto);
 
@@ -43,9 +43,9 @@ namespace TodoApp.Endpoints
                 
             });
 
-            mapGroup.MapPatch("/{tagId}", async (int tagId, UpdateTagDto tagUpdateDto, ITagService tagService, UpdateTagDtoValidator validator, ClaimsPrincipal user) =>
+            mapGroup.MapPatch("/{tagId:guid}", async (Guid tagId, UpdateTagDto tagUpdateDto, ITagService tagService, UpdateTagDtoValidator validator, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var validationResult = await validator.ValidateAsync(tagUpdateDto);
 
@@ -59,9 +59,9 @@ namespace TodoApp.Endpoints
                     : Results.NotFound(new { message = "Tag não encontrada." });
             });
 
-            mapGroup.MapDelete("/{tagId}", async (int tagId, ITagService tagService, ClaimsPrincipal user) =>
+            mapGroup.MapDelete("/{tagId:guid}", async (Guid tagId, ITagService tagService, ClaimsPrincipal user) =>
             {
-                int userId = user.GetUserId();
+                Guid userId = user.GetUserId();
 
                 var deleted = await tagService.DeleteTagAsync(tagId, userId);
 
