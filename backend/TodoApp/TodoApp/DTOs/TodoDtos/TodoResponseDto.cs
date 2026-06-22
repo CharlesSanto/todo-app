@@ -6,7 +6,7 @@ namespace TodoApp.DTOs.TodoDtos
 {
     public class TodoResponseDto
     {
-        public required int Id { get; init; }
+        public required Guid Id { get; init; }
         public required string Title { get; init; }
         public string? Description { get; init; }
         public DateTime? DueDate { get; init; }
