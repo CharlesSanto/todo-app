@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using System.Text;
+using Scalar.AspNetCore;
 using TodoApp.Data;
 using TodoApp.Endpoints;
 using TodoApp.Extensions;
@@ -12,42 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyMethod()
-                  .AllowAnyHeader();
-        });
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
 });
 
-// Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Insira o token JWT desta maneira: Bearer {seu token}"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
+builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<TodoDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -81,18 +54,22 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("todoFlow API");
+        options.WithTheme(ScalarTheme.Mars);
+        options.WithDefaultHttpClient(ScalarTarget.JavaScript, ScalarClient.Fetch);
+    });
 }
 
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
-app.UseAuthentication();    
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapUserEndpoints()
