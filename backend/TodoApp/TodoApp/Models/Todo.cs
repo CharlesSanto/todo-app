@@ -2,8 +2,8 @@
 {
     public class Todo
     {
-        public int Id { get; set; }
-        public required int UserId { get; set; }
+        public Guid Id { get; set; } = Guid.CreateVersion7();
+        public required Guid UserId { get; set; }
         public User User { get; set; } = null!;
         public required string Title { get; set; }
         public string? Description { get; set; }
