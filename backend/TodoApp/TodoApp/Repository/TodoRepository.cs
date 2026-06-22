@@ -14,7 +14,7 @@ namespace TodoApp.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Todo>> GetAllTodosAsync(int userId)
+        public async Task<IEnumerable<Todo>> GetAllTodosAsync(Guid userId)
         {
             return await _context.Todos
                 .AsNoTracking()
@@ -23,7 +23,7 @@ namespace TodoApp.Repository
                 .ToListAsync();
         }
 
-        public async Task<Todo?> GetTodoByIdAsync(int id, int userId)
+        public async Task<Todo?> GetTodoByIdAsync(Guid id, Guid userId)
         {
             return await _context.Todos
                 .Include(t => t.Tags)

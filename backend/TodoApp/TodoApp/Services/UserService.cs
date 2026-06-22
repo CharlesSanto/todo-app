@@ -17,7 +17,7 @@ namespace TodoApp.Services
             _passwordHasher = passwordHasher;
         }
 
-        public async Task<UserResponseDto?> GetUserByIdAsync(int id)
+        public async Task<UserResponseDto?> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
 
@@ -51,7 +51,7 @@ namespace TodoApp.Services
             return new UserResponseDto(await _userRepository.CreateUserAsync(user));
         }
 
-        public async Task<UserResponseDto?> UpdateUserAsync(int id, UpdateUserDto updateUserDto)
+        public async Task<UserResponseDto?> UpdateUserAsync(Guid id, UpdateUserDto updateUserDto)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
 
@@ -87,7 +87,7 @@ namespace TodoApp.Services
             return new UserResponseDto(await _userRepository.UpdateUserAsync(user));
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteUserAsync(Guid id)
         {
             var user = await _userRepository.GetUserByIdAsync(id);
 

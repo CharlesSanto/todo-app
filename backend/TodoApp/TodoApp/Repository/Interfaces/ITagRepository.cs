@@ -4,10 +4,10 @@ namespace TodoApp.Repository.Interfaces
 {
     public interface ITagRepository
     {
-        Task<IEnumerable<Tag>> GetAllTagsAsync(int userId);
-        Task<Tag?> GetTagByIdAsync(int id, int userId);
-        Task<Tag?> GetTagByNameAsync(string name, int userId);
-        Task<List<Tag>> GetByIdsAsync(IEnumerable<int> ids, int userId);
+        Task<IEnumerable<Tag>> GetAllTagsAsync(Guid userId);
+        Task<Tag?> GetTagByIdAsync(Guid id, Guid userId);
+        Task<Tag?> GetTagByNameAsync(string name, Guid userId);
+        Task<List<Tag>> GetByIdsAsync(IEnumerable<Guid> ids, Guid userId);
         Task<Tag> CreateTagAsync(Tag tag);
         Task<Tag> UpdateTagAsync(Tag tag);
         Task DeleteTagAsync(Tag tag);

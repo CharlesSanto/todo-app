@@ -14,14 +14,14 @@ namespace TodoApp.Services
             _tagRepository = tagRepository;
         }
 
-        public async Task<IEnumerable<TagResponseDto>> GetAllTagsAsync(int userId)
+        public async Task<IEnumerable<TagResponseDto>> GetAllTagsAsync(Guid userId)
         {
             var tags = await _tagRepository.GetAllTagsAsync(userId);
 
             return tags.Select(tag => new TagResponseDto(tag));
         }
 
-        public async Task<TagResponseDto?> GetTagByIdAsync(int tagId, int userId)
+        public async Task<TagResponseDto?> GetTagByIdAsync(Guid tagId, Guid userId)
         {
             var tag =  await _tagRepository.GetTagByIdAsync(tagId, userId);
 
@@ -30,7 +30,7 @@ namespace TodoApp.Services
             return new TagResponseDto(tag);
         }
 
-        public async Task<TagResponseDto> CreateTagAsync(int userId, CreateTagDto tagCreateDto)
+        public async Task<TagResponseDto> CreateTagAsync(Guid userId, CreateTagDto tagCreateDto)
         {
             var existingTag = await _tagRepository.GetTagByNameAsync(tagCreateDto.Name, userId);
 
@@ -50,7 +50,7 @@ namespace TodoApp.Services
             return new TagResponseDto(tag);
         }
 
-        public async Task<TagResponseDto?> UpdateTagAsync(int userId, int tagId, UpdateTagDto tagUpdateDto)
+        public async Task<TagResponseDto?> UpdateTagAsync(Guid userId, Guid tagId, UpdateTagDto tagUpdateDto)
         {
             var existingTag = await _tagRepository.GetTagByIdAsync(tagId, userId);
 
@@ -64,7 +64,7 @@ namespace TodoApp.Services
             return new TagResponseDto(await _tagRepository.UpdateTagAsync(existingTag));
         }
 
-        public async Task<bool> DeleteTagAsync(int tagId, int userId)
+        public async Task<bool> DeleteTagAsync(Guid tagId, Guid userId)
         {
             var tag = await _tagRepository.GetTagByIdAsync(tagId, userId);
 

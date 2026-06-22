@@ -15,7 +15,7 @@ namespace TodoApp.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Tag>> GetAllTagsAsync(int userId)
+        public async Task<IEnumerable<Tag>> GetAllTagsAsync(Guid userId)
         {
             return await _context.Tags
                 .AsNoTracking()
@@ -23,19 +23,19 @@ namespace TodoApp.Repository
                 .ToListAsync();
         }
 
-        public async Task<Tag?> GetTagByIdAsync(int id, int userId)
+        public async Task<Tag?> GetTagByIdAsync(Guid id, Guid userId)
         {
             return await _context.Tags
                 .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
         }
 
-        public async Task<Tag?> GetTagByNameAsync(string name, int userId)
+        public async Task<Tag?> GetTagByNameAsync(string name, Guid userId)
         {
             return await _context.Tags
                 .FirstOrDefaultAsync(t => t.Name.ToLower() == name.ToLower() && t.UserId == userId);
         }
 
-        public async Task<List<Tag>> GetByIdsAsync(IEnumerable<int> ids, int userId)
+        public async Task<List<Tag>> GetByIdsAsync(IEnumerable<Guid> ids, Guid userId)
         {
             return await _context.Tags
                 .Where(t => ids.Contains(t.Id) && t.UserId == userId)

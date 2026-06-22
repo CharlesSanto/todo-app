@@ -17,14 +17,14 @@ namespace TodoApp.Services
             _tagRepository = tagRepository;
         }
 
-        public async Task<IEnumerable<TodoResponseDto>> GetAllTodosAsync(int userId)
+        public async Task<IEnumerable<TodoResponseDto>> GetAllTodosAsync(Guid userId)
         {
             var todos = await _todoRepository.GetAllTodosAsync(userId);
 
             return todos.Select(todo => new TodoResponseDto(todo));
         }
 
-        public async Task<TodoResponseDto?> GetTodoByIdAsync(int id, int userId)
+        public async Task<TodoResponseDto?> GetTodoByIdAsync(Guid id, Guid userId)
         {
             var todo = await _todoRepository.GetTodoByIdAsync(id, userId);
 
@@ -33,7 +33,7 @@ namespace TodoApp.Services
             return new TodoResponseDto(todo);
         }
 
-        public async Task<TodoResponseDto> CreateTodoAsync(int userId, CreateTodoDto dto)
+        public async Task<TodoResponseDto> CreateTodoAsync(Guid userId, CreateTodoDto dto)
         {
             var newTodo = new Todo
             {
@@ -50,7 +50,7 @@ namespace TodoApp.Services
             return new TodoResponseDto(await _todoRepository.CreateTodoAsync(newTodo));
         }
 
-        public async Task<TodoResponseDto?> UpdateTodoAsync(int id, int userId, UpdateTodoDto dto)
+        public async Task<TodoResponseDto?> UpdateTodoAsync(Guid id, Guid userId, UpdateTodoDto dto)
         {
             var todo = await _todoRepository.GetTodoByIdAsync(id, userId);
 
@@ -87,7 +87,7 @@ namespace TodoApp.Services
 
         }
 
-        public async Task<bool> DeleteTodoAsync(int id, int userId)
+        public async Task<bool> DeleteTodoAsync(Guid id, Guid userId)
         {
             var todo = await _todoRepository.GetTodoByIdAsync(id, userId);
             if (todo == null) return false;
