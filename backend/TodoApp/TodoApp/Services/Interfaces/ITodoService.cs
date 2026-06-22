@@ -4,11 +4,11 @@ namespace TodoApp.Services.Interfaces
 {
     public interface ITodoService
     {
-        Task<IEnumerable<TodoResponseDto>> GetAllTodosAsync(int userId);
-        Task<TodoResponseDto?> GetTodoByIdAsync(int id, int userId);
-        Task<TodoResponseDto> CreateTodoAsync(int userId, CreateTodoDto dto);
-        Task<TodoResponseDto?> UpdateTodoAsync(int id, int userId, UpdateTodoDto dto);
-        Task<bool> DeleteTodoAsync(int id, int userId);
+        Task<IEnumerable<TodoResponseDto>> GetAllTodosAsync(Guid userId);
+        Task<TodoResponseDto?> GetTodoByIdAsync(Guid id, Guid userId);
+        Task<TodoResponseDto> CreateTodoAsync(Guid userId, CreateTodoDto dto);
+        Task<TodoResponseDto?> UpdateTodoAsync(Guid id, Guid userId, UpdateTodoDto dto);
+        Task<bool> DeleteTodoAsync(Guid id, Guid userId);
     }
 }
 
